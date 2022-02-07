@@ -5,6 +5,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Task
 
@@ -20,7 +21,7 @@ class CustomLoginView(LoginView):
     def get_success_url(self):
         return reverse_lazy('tasks')
     
-class TaskList(ListView):
+class TaskList(LoginRequiredMixin, ListView):
     model = Task
     context_object_name = 'tasks'
     
@@ -32,11 +33,11 @@ class TaskList(ListView):
         return context
     
     
-class TaskDetail(DetailView):
+class TaskDetail(LoginRequiredMixin, DetailView):
     model = Task
     
     
-class TaskCreate(CreateView):
+class TaskCreate(LoginRequiredMixin,CreateView):
     model = Task
     # fields = ['title', 'description', 'complete', 'created']
     fields = ['title', 'description', 'complete']
@@ -46,13 +47,13 @@ class TaskCreate(CreateView):
         form.instance.user = self.request.user
         return super(TaskCreate, self).form_valid(form) 
     
-class TaskUpdate(UpdateView):
+class TaskUpdate(LoginRequiredMixin, UpdateView):
     model = Task
     fields = ['title', 'description', 'complete']
     success_url = reverse_lazy('tasks')
     
     
-class DeleteView(DeleteView):
+class DeleteView(LoginRequiredMixin, DeleteView):
     model = Task
     context_object_name = 'task'
     success_url = reverse_lazy('tasks')
