@@ -26,9 +26,9 @@ class TaskList(ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # filter tasks by user
         context ['tasks'] = context ['tasks'].filter(user = self.request.user)
         context ['count'] = context ['tasks'].filter(complete = False).count()
-
         return context
     
     
@@ -39,13 +39,16 @@ class TaskDetail(DetailView):
 class TaskCreate(CreateView):
     model = Task
     # fields = ['title', 'description', 'complete', 'created']
-    fields = '__all__'
+    fields = ['title', 'description', 'complete']
     success_url = reverse_lazy('tasks')
     
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super(TaskCreate, self).form_valid(form) 
     
 class TaskUpdate(UpdateView):
     model = Task
-    fields = '__all__'
+    fields = ['title', 'description', 'complete']
     success_url = reverse_lazy('tasks')
     
     
